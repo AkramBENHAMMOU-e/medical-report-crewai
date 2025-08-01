@@ -1,0 +1,23 @@
+[project]
+name = "medical_report"
+version = "0.1.0"
+description = "medical-report using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]>=0.152.0,<1.0.0"
+]
+
+[project.scripts]
+medical_report = "medical_report.main:run"
+run_crew = "medical_report.main:run"
+train = "medical_report.main:train"
+replay = "medical_report.main:replay"
+test = "medical_report.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
