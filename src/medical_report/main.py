@@ -1,68 +1,55 @@
-#!/usr/bin/env python
 import sys
 import warnings
 
-from datetime import datetime
-
-from medical_report.crew import MedicalReport
+from medical_report.crew import MedicalReportCrew 
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
 
 def run():
     """
-    Run the crew.
+    Exécute le crew.
     """
+
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        'topic': 'Anxiété généralisée et troubles du sommeil' 
     }
     
     try:
-        MedicalReport().crew().kickoff(inputs=inputs)
+        MedicalReportCrew().crew().kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
 
 def train():
     """
-    Train the crew for a given number of iterations.
+    Entraîne le crew pour un nombre donné d'itérations.
     """
     inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
+        'topic': 'Anxiété généralisée et troubles du sommeil'
     }
     try:
-        MedicalReport().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
+        MedicalReportCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
 
 def replay():
     """
-    Replay the crew execution from a specific task.
+    Rejoue l'exécution du crew à partir d'une tâche spécifique.
     """
     try:
-        MedicalReport().crew().replay(task_id=sys.argv[1])
-
+        MedicalReportCrew().crew().replay(task_id=sys.argv[1])
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
 
 def test():
     """
-    Test the crew execution and returns the results.
+    Teste l'exécution du crew et retourne les résultats.
     """
     inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
+        'topic': 'Anxiété généralisée et troubles du sommeil'
     }
-    
     try:
-        MedicalReport().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
+        MedicalReportCrew().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")

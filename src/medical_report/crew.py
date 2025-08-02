@@ -1,64 +1,79 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai.agents.agent_builder.base_agent import BaseAgent
-from typing import List
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from .tools.custom_tool import AskPatientTool
 
 @CrewBase
-class MedicalReport():
-    """MedicalReport crew"""
+class MedicalReportCrew():
+    """Crew psychiatrique pour la génération de rapports médicaux"""
+    agents_config = 'config/agents.yaml'
+    tasks_config = 'config/tasks.yaml'
 
-    agents: List[BaseAgent]
-    tasks: List[Task]
-
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
+    def interviewer_clinique(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
+            config=self.agents_config['interviewer_clinique'],
+            tools=[AskPatientTool()],
             verbose=True
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def analyste_clinique(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
+            config=self.agents_config['analyste_clinique'], 
             verbose=True
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+    @agent
+    def synthetiseur_diagnostique(self) -> Agent:
+        return Agent(
+            config=self.agents_config['synthetiseur_diagnostique'], 
+            verbose=True
+        )
+
+    @agent
+    def redacteur_medical(self) -> Agent:
+        return Agent(
+            config=self.agents_config['redacteur_medical'], 
+            verbose=True
         )
 
     @task
-    def reporting_task(self) -> Task:
+    def tache_entretien_interactif(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['tache_entretien_interactif'],
+            agent=self.interviewer_clinique()
+        )
+
+    @task
+    def tache_structuration_dossier(self) -> Task:
+        return Task(
+            config=self.tasks_config['tache_structuration_dossier'],
+            agent=self.analyste_clinique(),
+            context=[self.tache_entretien_interactif()]
+        )
+
+    @task
+    def tache_analyse_diagnostique(self) -> Task:
+        return Task(
+            config=self.tasks_config['tache_analyse_diagnostique'],
+            agent=self.synthetiseur_diagnostique(),
+            context=[self.tache_structuration_dossier()]
+        )
+
+    @task
+    def tache_redaction_rapport_final(self) -> Task:
+        return Task(
+            config=self.tasks_config['tache_redaction_rapport_final'],
+            agent=self.redacteur_medical(),
+            context=[self.tache_analyse_diagnostique()],
+            output_file='rapport_psychiatrique.md'
         )
 
     @crew
     def crew(self) -> Crew:
-        """Creates the MedicalReport crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
-            verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
+            verbose=True
         )
