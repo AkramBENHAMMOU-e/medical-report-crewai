@@ -187,26 +187,9 @@ medical/
 - Discord (communauté): https://discord.com/invite/X4JWnZnxPb
 
 ## 11) Démo vidéo
-Ajoutez une courte démonstration vidéo du parcours complet (démarrage backend, entretien, génération et téléchargement du PDF).
 
-- Étapes suggérées à montrer:
-  1. Démarrer le backend: `crewai run` (http://127.0.0.1:5001)
-  2. Démarrer le frontend: `npm run dev` (http://127.0.0.1:5173)
-  3. Saisir le motif de consultation, répondre aux 10 questions
-  4. Affichage du message de complétion et téléchargement du PDF
-
-- Hébergement recommandé:
-  - YouTube (non répertoriée) et lien public
-  - ou un fichier `.mp4` dans un dossier `docs/` du repo (attention à la taille)
-
-- Exemple d’intégration (YouTube):
 ```md
-[![Voir la démo vidéo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
-```
-
-- Exemple de lien direct (fichier local):
-```md
-[Voir la démo vidéo](docs/demo-psychat.mp4)
+[docs/demo-psychat.mp4](https://github.com/AkramBENHAMMOU-e/medical-report-crewai/issues/1#issue-3311797672)
 ```
 
 ## 10) Licence & crédits
