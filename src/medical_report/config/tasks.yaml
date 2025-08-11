@@ -1,52 +1,46 @@
 tache_entretien_interactif:
   description: >
-    Votre mission est de mener un entretien clinique complet avec le patient, une question à la fois, en utilisant l'outil "Poser une Question au Patient".
+    Votre mission est de mener un entretien psychiatrique ADAPTATIF et de poser EXACTEMENT 10 questions.
     Le sujet général de la consultation est : '{topic}'.
-    
-    Suivez ce processus :
-    1.  Posez 3 questions de base (Nom, Âge, Langue).
-    2.  Posez ensuite 7 à 10 questions cliniques pertinentes pour explorer le sujet '{topic}'.
-    3.  À la fin, compilez l'intégralité de la conversation.
 
+    RÈGLES STRICTES :
+    - Posez UNE SEULE question à la fois via l'outil "Poser une Question au Patient".
+    - Analysez la réponse avec vos capacités d'agent (et si besoin "Analyser la Réponse du Patient").
+    - Adaptez dynamiquement la question suivante au contexte.
+    - Après la 10e question et sa réponse, DONNEZ IMMÉDIATEMENT votre Final Answer:
+      la transcription complète des 10 questions et 10 réponses, rien d'autre. N'utilisez plus d'outils.
+    - NE PAS dépasser 10 questions.
+
+    LIGNES DIRECTRICES :
+    1. Identification (Prénom, âge si manquants), motif de consultation
+    2. Histoire du problème et facteurs de déclenchement/entretien
+    3. Symptômes précis (fréquence, intensité, durée, retentissement)
+    4. Antécédents médicaux/psychiatriques, traitements
+    5. Contexte psychosocial (travail, famille, stress)
+    
   expected_output: >
-    Une transcription complète et littérale de l'entretien, formatée en Markdown.
-    Le format DOIT être le suivant, sans aucune autre introduction ou conclusion :
+    La transcription complète et littérale des 10 questions et 10 réponses.
 
-    ## Transcription de l'Entretien
-    
-    - **Question:** [Texte de la première question posée]
-    - **Réponse:** [Texte de la première réponse du patient]
-    
-    - **Question:** [Texte de la deuxième question posée]
-    - **Réponse:** [Texte de la deuxième réponse du patient]
-    
-    ... et ainsi de suite pour toute la conversation.
+    ## Transcription de l'Entretien (10 échanges)
+    - **Question 1:** ...
+    - **Réponse 1:** ...
+    - **Question 2:** ...
+    - **Réponse 2:** ...
+    ...
+    - **Question 10:** ...
+    - **Réponse 10:** ...
 
   agent: interviewer_clinique
 
+# Les autres tâches inchangées
+
 tache_structuration_dossier:
   description: >
-    Vous avez reçu une transcription d'entretien brute en contexte.
+    Vous avez reçu une transcription d'entretien brute en contexte (exactement 10 échanges).
     Votre unique tâche est de LIRE cette transcription et d'extraire les informations pour les organiser dans un dossier patient structuré.
     NE PAS inventer d'informations. N'utilisez que ce qui est écrit dans la transcription.
   expected_output: >
     Un dossier patient clair et bien organisé, formaté en Markdown.
-    Le dossier doit contenir des sections basées sur les informations réellement fournies par le patient, par exemple :
-
-    # Dossier Patient
-    
-    ## Informations Générales
-    - **Nom:** [Nom extrait de la transcription]
-    - **Âge:** [Âge extrait de la transcription]
-
-    ## Résumé des Symptômes
-    - [Liste à puces des symptômes décrits par le patient]
-
-    ## Histoire et Contexte
-    - [Paragraphe résumant l'histoire et le contexte donnés par le patient]
-    
-    ## Autres Informations Pertinentes
-    - [Toute autre donnée clé extraite de la transcription]
 
   agent: analyste_clinique
   context:
@@ -56,25 +50,17 @@ tache_analyse_diagnostique:
   description: >
     Analysez UNIQUEMENT le dossier patient structuré qui vous est fourni en contexte.
     Formulez des hypothèses diagnostiques basées sur les informations spécifiques de ce dossier.
-    Si le dossier contient suffisamment d'informations, utilisez l'outil DSM-5 pour valider vos hypothèses.
-    NE PAS créer d'hypothèses génériques si les données sont présentes.
   expected_output: >
-    Une note d'analyse clinique concise et spécifique au patient, contenant :
-    1. Un résumé des symptômes clés du patient.
-    2. Une hypothèse diagnostique principale (ex: Trouble d'Anxiété Généralisée).
-    3. Les diagnostics différentiels à considérer.
-    4. Une courte formulation clinique expliquant la situation du patient.
+    Une note d'analyse clinique concise et spécifique au patient.
   agent: synthetiseur_diagnostique
   context:
     - tache_structuration_dossier
 
 tache_redaction_rapport_final:
   description: >
-    En utilisant la note d'analyse clinique SPÉCIFIQUE AU PATIENT, rédigez le rapport psychiatrique final.
-    Le rapport doit refléter les informations réelles du patient et non des modèles génériques.
-    Intégrez directement les conclusions de l'analyse dans le rapport final.
+    En utilisant la note d'analyse clinique SPÉCIFIQUE AU PATIENT, rédigez le rapport final.
   expected_output: >
-    Un rapport psychiatrique final complet, personnalisé avec les informations du patient, formaté en Markdown. Il ne doit plus contenir de phrases comme "en l'absence d'informations".
+    Un rapport psychiatrique final complet, personnalisé et cohérent, en Markdown.
   agent: redacteur_medical
   context:
     - tache_analyse_diagnostique

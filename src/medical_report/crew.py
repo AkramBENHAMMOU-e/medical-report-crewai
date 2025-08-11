@@ -1,6 +1,8 @@
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from .tools.custom_tool import AskPatientTool
+from .tools.custom_tool import AskPatientTool, AnalyzePatientResponseTool
+
 
 @CrewBase
 class MedicalReportCrew():
@@ -12,7 +14,9 @@ class MedicalReportCrew():
     def interviewer_clinique(self) -> Agent:
         return Agent(
             config=self.agents_config['interviewer_clinique'],
-            tools=[AskPatientTool()],
+            tools=[AskPatientTool(), AnalyzePatientResponseTool()],
+            memory=True,
+            temperature=0.9,
             verbose=True
         )
 
@@ -37,6 +41,7 @@ class MedicalReportCrew():
             verbose=True
         )
 
+   
     @task
     def tache_entretien_interactif(self) -> Task:
         return Task(

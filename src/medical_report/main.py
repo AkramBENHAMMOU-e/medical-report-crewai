@@ -1,55 +1,27 @@
 import sys
-import warnings
+import os
 
-from medical_report.crew import MedicalReportCrew 
-
-warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
-
-
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, project_root)
 def run():
     """
-    Exécute le crew.
+    Démarre le serveur web Flask.
     """
-
-    inputs = {
-        'topic': 'Anxiété généralisée et troubles du sommeil' 
-    }
+    print("--------------------------------------------------")
+    print("--- Lancement du serveur web pour l'assistant AI ---")
+    print("--------------------------------------------------")
+    from app import app
     
-    try:
-        MedicalReportCrew().crew().kickoff(inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+    print(f"Serveur démarré. Ouvrez votre navigateur à l'adresse : http://127.0.0.1:5001")
+    os.chdir(project_root)
+    app.run(debug=True, port=5001, host='0.0.0.0')
 
 
 def train():
-    """
-    Entraîne le crew pour un nombre donné d'itérations.
-    """
-    inputs = {
-        'topic': 'Anxiété généralisée et troubles du sommeil'
-    }
-    try:
-        MedicalReportCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+    print("La fonction 'train' n'est pas implémentée pour l'application web.")
 
 def replay():
-    """
-    Rejoue l'exécution du crew à partir d'une tâche spécifique.
-    """
-    try:
-        MedicalReportCrew().crew().replay(task_id=sys.argv[1])
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+    print("La fonction 'replay' n'est pas implémentée pour l'application web.")
 
 def test():
-    """
-    Teste l'exécution du crew et retourne les résultats.
-    """
-    inputs = {
-        'topic': 'Anxiété généralisée et troubles du sommeil'
-    }
-    try:
-        MedicalReportCrew().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+    print("La fonction 'test' n'est pas implémentée pour l'application web.")   
