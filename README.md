@@ -11,6 +11,12 @@ Objectifs clés:
 ## Architecture overview
 ![Texte alternatif](./assets/architecture.png)
 
+## Démo vidéo
+
+```md
+[Voir la démo vidéo](demo (1).mp4)
+```
+
 ## 2) Pile technologique
 - Frontend:
   - React + TypeScript (Vite)
@@ -186,13 +192,5 @@ medical/
 - Dépôt GitHub: https://github.com/joaomdmoura/crewai
 - Discord (communauté): https://discord.com/invite/X4JWnZnxPb
 
-## 11) Démo vidéo
 
-```md
-[docs/demo-psychat.mp4](https://github.com/AkramBENHAMMOU-e/medical-report-crewai/issues/1#issue-3311797672)
-```
-
-## 10) Licence & crédits
-- Ce projet est fourni à des fins d’expérimentation et de démonstration.
-- CrewAI © leurs auteurs respectifs. ReportLab © ReportLab. React/Vite/Tailwind © leurs auteurs.
 
