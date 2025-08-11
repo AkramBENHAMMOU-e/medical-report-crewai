@@ -1,54 +1,215 @@
-# MedicalReport Crew
+# PsyChat — Système d’entretien clinique assisté par IA et génération de rapport psychiatrique
 
-Welcome to the MedicalReport Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+## 1) Présentation du projet
+PsyChat est une application assistant les professionnels de santé à conduire un entretien clinique structuré en 10 questions et à produire automatiquement un rapport psychiatrique PDF clair et professionnel.
 
-## Installation
+Objectifs clés:
+- Guider le patient au travers d’un entretien structuré (10 questions)
+- Synthétiser les réponses et produire un rapport professionnel au format PDF
+- Offrir une expérience rassurante et confidentielle, conforme aux bonnes pratiques
+- Proposer une interface moderne (branding PsyChat) et un design minimaliste (2 couleurs)
+## Architecture overview
+![Texte alternatif](./assets/architecture.png)
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+## 2) Pile technologique
+- Frontend:
+  - React + TypeScript (Vite)
+  - Tailwind CSS (UI moderne, responsive)
+- Backend:
+  - Flask (Python) avec CORS
+- Cadre IA:
+  - CrewAI pour l’orchestration multi‑agents (entretien, analyse, synthèse, rédaction)
+- Génération PDF:
+  - ReportLab (mise en page professionnelle, logo, en‑tête/pied de page)
+- Identité visuelle:
+  - Logo PsyChat
+  - Palette 2 couleurs: bleu `#2B6CB0` et gris très foncé `#111827`
 
-First, if you haven't already, install uv:
 
+## 3) Architecture multi‑agents (CrewAI)
+PsyChat s’appuie sur un pipeline d’agents spécialisés orchestrés séquentiellement par CrewAI (voir `medical_report/src/medical_report/crew.py` et `config/*.yaml`).
+
+Agents et rôles:
+- interviewer_clinique: conduit l’entretien en 10 questions, collecte les réponses du patient
+- analyste_clinique: structure les informations recueillies et établit un dossier synthétique
+- synthetiseur_diagnostique: élabore des hypothèses/axes cliniques à partir des données
+- redacteur_medical: rédige le rapport final clair et professionnel (markdown), prêt à être converti en PDF
+
+Pourquoi le multi‑agent?
+- Robustesse et clarté: chaque agent se concentre sur une compétence clinique spécifique
+- Traçabilité: étapes distinctes et séquentielles (Process.sequential)
+- Qualité: améliore la cohérence et la structure des résultats
+
+
+## 4) API — Endpoints REST
+Base locale (par défaut): `http://127.0.0.1:5001`
+
+- POST `/start`
+  - Démarre une nouvelle session d’entretien
+  - Body JSON: `{ "topic": "Motif / sujet de consultation" }`
+  - Réponse: `{ "session_id": string, "question": string }`
+
+- POST `/chat`
+  - Envoie la réponse du patient et reçoit la prochaine question
+  - Body JSON: `{ "session_id": string, "answer": string }`
+  - Réponse:
+    - `{ "question": string }` tant que l’entretien n’est pas terminé
+    - `{ "report": string, "session_id": string }` à la fin (markdown du rapport)
+
+- GET `/download/{session_id}`
+  - Télécharge le rapport PDF généré
+  - Réponse: fichier `application/pdf`
+
+- POST `/cleanup/{session_id}`
+  - Supprime le fichier PDF temporaire et nettoie la session
+  - Réponse: `{ "success": true }`
+
+Exemples cURL:
 ```bash
+# Démarrer une session
+curl -X POST http://127.0.0.1:5001/start \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"Anxiété et sommeil"}'
+
+# Envoyer une réponse
+curl -X POST http://127.0.0.1:5001/chat \
+  -H "Content-Type: application/json" \
+  -d '{"session_id":"<ID>","answer":"Réponse du patient"}'
+
+# Télécharger le PDF
+curl -L -o rapport.pdf http://127.0.0.1:5001/download/<ID>
+
+# Nettoyer la session
+curl -X POST http://127.0.0.1:5001/cleanup/<ID>
+```
+
+
+## 5) Fonctionnalités Frontend
+- Interface simple, professionnelle, fidèle à la marque PsyChat (logo, palette)
+- Chat temps réel pour l’entretien en 10 questions
+- Message de complétion rassurant après la dernière question:
+  - confirme la fin de l’entretien
+  - informe du traitement des réponses pour générer le PDF
+  - affiche une estimation courte avant d’afficher le bouton de téléchargement
+  - réassure sur la confidentialité des informations
+- Téléchargement du PDF en un clic
+- Responsive et accessible (focus styles, contrastes, tailles de police)
+
+
+## 6) Génération de rapport (PDF)
+Le backend transforme le markdown produit par les agents en PDF professionnel via ReportLab (voir `medical_report/src/medical_report/pdf_generator.py`).
+
+Caractéristiques du rendu:
+- Nettoyage du markdown: retrait des placeholders (p. ex. `[À compléter]`), lignes système, doublons
+- Mise en forme professionnelle:
+  - Corps: 14pt (leading ~20)
+  - Titres de section: 18pt
+  - Titre principal: 24pt
+- Multi‑pages: activé pour garantir la lisibilité
+- Identité visuelle: logo PsyChat (en‑tête), ligne d’accent, deux couleurs
+- Mentions de confidentialité en pied de page
+
+
+## 7) Installation et exécution locale
+Prérequis:
+- Python 3.10+
+- Node.js 18+
+- npm ou yarn/pnpm
+
+Cloner le dépôt:
+```bash
+git clone <url-du-repo>
+```
+
+Backend (Flask via crewAI):
+```bash
+# Créer/activer un environnement virtuel (recommandé)
+python -m venv .venv
+.venv\Scripts\Activate.ps1  # PowerShell (ou .venv\Scripts\activate.bat en CMD)
+
+# Installer uv (gestion des dépendances) et crewAI
 pip install uv
+
+crewai install  
+
+# Lancer le serveur web Flask via crewAI
+crewai run  # démarre sur http://127.0.0.1:5001
 ```
 
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
+Frontend (React/Vite):
 ```bash
-crewai install
+cd medical_report/frontend
+npm install
+npm run dev  # http://127.0.0.1:5173
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+Configuration CORS (optionnelle, production):
+- Backend: restreindre l’origine FRONTEND_ORIGIN
+- Frontend: utilisez `VITE_API_BASE` pour pointer vers l’URL publique du backend
 
-- Modify `src/medical_report/config/agents.yaml` to define your agents
-- Modify `src/medical_report/config/tasks.yaml` to define your tasks
-- Modify `src/medical_report/crew.py` to add your own logic, tools and specific args
-- Modify `src/medical_report/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
+Exemple (Vite):
 ```bash
-$ crewai run
+# Vercel / variables d’environnement
+VITE_API_BASE=https://votre-backend.exemple.app
 ```
 
-This command initializes the medical-report Crew, assembling the agents and assigning them tasks as defined in your configuration.
+Dépannage:
+- `Rapport PDF non disponible`: la génération a échoué; voir logs backend
+- Télémetrie CrewAI timeout: inoffensif; peut être ignoré en local
+- CORS: vérifier l’origine autorisée côté Flask et la variable `VITE_API_BASE` côté frontend
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
-## Understanding Your Crew
+## 8) Sécurité & Confidentialité
+- Les données de session sont temporaires (fichiers PDF supprimés après téléchargement via `/cleanup`)
+- Les échanges sont limités à l’entretien clinique et au rapport; ne stockez aucune donnée sensible en dur
+- En production, activez HTTPS et limitez strictement les origines CORS
 
-The medical-report Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
-## Support
+## 9) Structure des dossiers (extrait)
+```
+medical/
+└── medical_report/
+    ├── app.py                      # API Flask
+    ├── frontend/                   # Vite + React + Tailwind
+    │   └── src/App.tsx            # Interface d’entretien + message de complétion
+    └── src/medical_report/
+        ├── crew.py                 # Orchestration CrewAI
+        ├── pdf_generator.py        # Génération PDF (ReportLab)
+        └── config/                 # agents.yaml, tasks.yaml
+```
 
-For support, questions, or feedback regarding the MedicalReport Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
 
-Let's create wonders together with the power and simplicity of crewAI.
+
+## 10) Ressources CrewAI (liens utiles)
+- Site officiel: https://www.crewai.com/
+- Documentation: https://docs.crewai.com/
+- Dépôt GitHub: https://github.com/joaomdmoura/crewai
+- Discord (communauté): https://discord.com/invite/X4JWnZnxPb
+
+## 11) Démo vidéo
+Ajoutez une courte démonstration vidéo du parcours complet (démarrage backend, entretien, génération et téléchargement du PDF).
+
+- Étapes suggérées à montrer:
+  1. Démarrer le backend: `crewai run` (http://127.0.0.1:5001)
+  2. Démarrer le frontend: `npm run dev` (http://127.0.0.1:5173)
+  3. Saisir le motif de consultation, répondre aux 10 questions
+  4. Affichage du message de complétion et téléchargement du PDF
+
+- Hébergement recommandé:
+  - YouTube (non répertoriée) et lien public
+  - ou un fichier `.mp4` dans un dossier `docs/` du repo (attention à la taille)
+
+- Exemple d’intégration (YouTube):
+```md
+[![Voir la démo vidéo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
+```
+
+- Exemple de lien direct (fichier local):
+```md
+[Voir la démo vidéo](docs/demo-psychat.mp4)
+```
+
+## 10) Licence & crédits
+- Ce projet est fourni à des fins d’expérimentation et de démonstration.
+- CrewAI © leurs auteurs respectifs. ReportLab © ReportLab. React/Vite/Tailwind © leurs auteurs.
+
