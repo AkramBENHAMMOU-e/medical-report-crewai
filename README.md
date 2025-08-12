@@ -13,6 +13,8 @@ Objectifs clés:
 
 ## Démo vidéo
 
+### Cliquer sur la minature pour voir une demo
+
 [![Demo Psychat](https://img.youtube.com/vi/av04WHmX4us/maxresdefault.jpg)](https://youtu.be/av04WHmX4us)
 
 
