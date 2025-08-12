@@ -13,9 +13,8 @@ Objectifs clés:
 
 ## Démo vidéo
 
-```md
-[Voir la démo vidéo](demo (1).mp4)
-```
+[![Demo Psychat](https://img.youtube.com/vi/av04WHmX4us/maxresdefault.jpg)](https://youtu.be/av04WHmX4us)
+
 
 ## 2) Pile technologique
 - Frontend:
